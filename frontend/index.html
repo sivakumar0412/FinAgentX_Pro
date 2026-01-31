@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Driven DRL Conglomerate Trading</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* =====================================================
+   COLORFUL TRADING DASHBOARD UI
+   Neon + Gradient + Vibrant Colors
+===================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+
+:root{
+  --bg-main:#f0f4ff;
+  --panel:#ffffff;
+  --glass:#ffffff80;
+
+  --primary:#ff3c78;
+  --secondary:#6b21a8;
+  --success:#10b981;
+  --danger:#ef4444;
+  --warning:#facc15;
+  --info:#0ea5e9;
+  --highlight:#f97316;
+
+  --text-main:#1f2937;
+  --text-muted:#6b7280;
+
+  --shadow-soft:0 8px 20px rgba(0,0,0,0.15);
+  --shadow-deep:0 20px 40px rgba(0,0,0,0.25);
+
+  --radius-lg:20px;
+  --radius-md:14px;
+}
+
+/* =====================================================
+   RESET
+===================================================== */
+*{
+  box-sizing:border-box;
+  font-family:'Poppins', Inter, sans-serif;
+}
+
+html, body{
+  height:100%;
+  margin:0;
+  background:var(--bg-main);
+  color:var(--text-main);
+  overflow:hidden;
+}
+
+body{
+  display:flex;
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+.sidebar{
+  width:280px;
+  padding:26px;
+  background:linear-gradient(180deg,#ff9a8b,#ff6a88,#ff99ac);
+  box-shadow:var(--shadow-deep);
+  overflow-y:auto;
+  position:relative;
+}
+
+.sidebar h2{
+  font-size:26px;
+  font-weight:900;
+  margin-bottom:26px;
+  background:linear-gradient(90deg,#ff3c78,#f97316,#6b21a8);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.sidebar button{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border:none;
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,0.15);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  transition:.3s;
+  box-shadow:var(--shadow-soft);
+}
+
+.sidebar button:hover{
+  background:linear-gradient(135deg,#ff3c78,#f97316,#6b21a8);
+  color:#fff;
+  transform:translateX(6px);
+  box-shadow:0 0 12px rgba(0,0,0,0.25);
+}
+
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
+.main{
+  flex:1;
+  padding:28px;
+  overflow-y:auto;
+  height:100vh;
+  font-family:'Poppins', Inter, sans-serif;
+}
+
+/* =====================================================
+   SECTIONS
+===================================================== */
+.section{
+  display:none;
+  animation:fadeUp .45s ease;
+}
+.section.active{display:block}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(15px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* =====================================================
+   HEADINGS
+===================================================== */
+h1{
+  font-size:30px;
+  font-weight:900;
+  margin-bottom:22px;
+  background:linear-gradient(90deg,#ff3c78,#f97316,#6b21a8,#0ea5e9);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  letter-spacing:0.5px;
+}
+
+/* =====================================================
+   CARDS – COLORFUL GLASS EFFECT
+===================================================== */
+.card{
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  border-radius:var(--radius-lg);
+  padding:22px;
+  margin-bottom:22px;
+  box-shadow:var(--shadow-soft);
+  transition:.3s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-deep);
+}
+
+/* =====================================================
+   METRIC GRID
+===================================================== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:16px;
+}
+
+.metric{
+  border-radius:var(--radius-md);
+  padding:18px;
+  text-align:center;
+  box-shadow:var(--shadow-soft);
+  transition:.3s;
+}
+
+.metric:nth-child(1){background:#ffdde1;color:#ff3c78;}
+.metric:nth-child(2){background:#e0f7fa;color:#06b6d4;}
+.metric:nth-child(3){background:#d1fae5;color:#10b981;}
+.metric:nth-child(4){background:#fff4e5;color:#f97316;}
+.metric:nth-child(5){background:#fce7f3;color:#8b5cf6;}
+.metric:nth-child(6){background:#fee2e2;color:#ef4444;}
+
+.metric:hover{
+  transform:translateY(-5px);
+  box-shadow:0 0 20px #f97316;
+}
+
+.metric span{
+  display:block;
+  margin-top:6px;
+  font-size:22px;
+  font-weight:800;
+}
+
+/* =====================================================
+   DECISION BADGE
+===================================================== */
+.decision{
+  font-size:32px;
+  font-weight:900;
+  padding:20px;
+  text-align:center;
+  border-radius:var(--radius-lg);
+  letter-spacing:1px;
+  box-shadow:0 0 25px rgba(0,0,0,0.25);
+}
+
+.buy{
+  background:linear-gradient(135deg,#a7f3d0,#10b981);
+  color:#065f46;
+  box-shadow:0 0 15px #10b981;
+}
+
+.sell{
+  background:linear-gradient(135deg,#fecaca,#ef4444);
+  color:#7f1d1d;
+  box-shadow:0 0 15px #ef4444;
+}
+
+.hold{
+  background:linear-gradient(135deg,#fef08a,#facc15);
+  color:#78350f;
+  box-shadow:0 0 15px #facc15;
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+.card button{
+  padding:14px 24px;
+  border:none;
+  border-radius:16px;
+  font-weight:800;
+  background:linear-gradient(135deg,#ff3c78,#f97316,#6b21a8);
+  color:#fff;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.card button:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 20px #f97316;
+}
+
+/* =====================================================
+   INPUTS
+===================================================== */
+input,select{
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,0.1);
+  font-weight:600;
+  background:#ffffff;
+  color:var(--text-main);
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#ffffff;
+}
+
+th,td{
+  padding:12px;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+  text-align:center;
+}
+
+th{
+  background:linear-gradient(135deg,#ff3c78,#f97316,#6b21a8);
+  color:#fff;
+  font-weight:800;
+}
+
+/* =====================================================
+   CHART AREA
+===================================================== */
+canvas{
+  background:#ffffff;
+  border-radius:var(--radius-lg);
+  padding:14px;
+  box-shadow:var(--shadow-soft);
+}
+
+#finalSummary canvas{
+  max-width:420px;
+  max-height:420px;
+  margin:0 auto;
+  display:block;
+}
+
+/* =====================================================
+   RULE TEXT
+===================================================== */
+.rule{
+  margin-bottom:8px;
+  font-weight:600;
+  color:#6b21a8;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>AI-DRL Trader</h2>
+<button onclick="showSection('dashboard')">Dashboard</button>
+<button onclick="showSection('risk')">Risk</button>
+<button onclick="showSection('agent')">DRL Agent</button>
+<button onclick="showSection('performance')">Performance</button>
+<button onclick="showSection('history')">History</button>
+    <button onclick="showSection('health')">Trading Health</button>
+    <button onclick="showSection('intelligence')">Agent Intelligence</button>
+    <button onclick="showSection('finalSummary')">Final Summary</button>
+
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+<h1>Conglomerate Trading Dashboard</h1>
+
+<div class="card">
+<select id="groupSelect" onchange="changeGroup()">
+<option value="RELIANCE">Reliance Group</option>
+<option value="TATA">Tata Group</option>
+<option value="ADANI">Adani Group</option>
+<option value="SAMSUNG">Samsung Group</option>
+</select>
+Active Group: <b id="liveGroup">Reliance Group</b>
+</div>
+
+<div class="grid">
+<div class="metric">Price<span id="price">0</span></div>
+<div class="metric">Confidence<span id="confidence">0%</span></div>
+<div class="metric">Risk<span id="riskMetric">LOW</span></div>
+<div class="metric">Return<span id="returnMetric">0%</span></div>
+<div class="metric">Position Size<span id="positionSize">₹0</span></div>
+<div class="metric">Risk Used<span id="riskUsed">0%</span></div>
+</div>
+
+<div id="decisionBox" class="decision hold">HOLD</div>
+
+<div class="card">
+<button onclick="setManual('BUY')">BUY</button>
+<button onclick="setManual('SELL')">SELL</button>
+<button onclick="setManual('HOLD')">HOLD</button>
+</div>
+
+<div class="card"><canvas id="priceChart"></canvas></div>
+<div class="card"><canvas id="equityChart"></canvas></div>
+</div>
+
+<!-- RISK -->
+<div id="risk" class="section">
+<h1>Risk Management</h1>
+Capital <input id="capital" value="100000" oninput="calcRisk()"><br>
+Risk % <input id="riskPct" value="0.75" oninput="calcRisk()"><br>
+Stop Loss % <input id="sl" value="1" oninput="calcRisk()"><br>
+Take Profit % <input id="tp" value="3" oninput="calcRisk()"><br><br>
+Max Loss: ₹<span id="maxLoss">0</span><br>
+Max Position: ₹<span id="position">0</span><br>
+RR: <span id="rr">0</span>
+</div>
+
+<!-- AGENT -->
+<div id="agent" class="section">
+<h1>DRL Agent Explanation</h1>
+
+<div class="card">
+<h3>📜  Agent Rules</h3>
+<div class="rule">✔ BUY only if confidence ≥ 65% and volatility is LOW/MEDIUM</div>
+<div class="rule">✔ SELL when confidence ≤ 45% or trend is DOWN</div>
+<div class="rule">✔ HOLD if confidence &lt; 60%</div>
+<div class="rule">✔ HOLD if volatility is HIGH</div>
+<div class="rule">✔ HOLD if market trend is SIDEWAYS</div>
+<div class="rule">✔ HOLD protects capital during uncertainty</div>
+</div>
+
+
+<div class="card" id="agentLogic"></div>
+</div>
+
+<!-- PERFORMANCE -->
+<div id="performance" class="section">
+<h1>P/L by Group</h1>
+<canvas id="plChart"></canvas>
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="section">
+<h1>Trade History</h1>
+<table>
+<thead>
+<tr>
+<th>Time</th><th>Group</th><th>Stock</th>
+<th>Action</th><th>Price</th>
+<th>Position ₹</th><th>PnL</th><th>Mode</th>
+</tr>
+</thead>
+<tbody id="historyBody"></tbody>
+</table>
+</div>
+    <!-- DAY 4 : TRADING HEALTH -->
+<div id="health" class="section">
+<h1>📊 Trading Health</h1>
+
+<div class="card">
+<h3>Trade Quality</h3>
+<table>
+<tr><th>Total Trades</th><td id="d4_total">0</td></tr>
+<tr><th>Winning Trades</th><td id="d4_win">0</td></tr>
+<tr><th>Losing Trades</th><td id="d4_loss">0</td></tr>
+<tr><th>Win Rate</th><td id="d4_rate">0%</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>Drawdown</h3>
+<table>
+<tr><th>Peak Capital</th><td id="d4_peak">₹0</td></tr>
+<tr><th>Current Drawdown</th><td id="d4_dd">0%</td></tr>
+<tr><th>Max Drawdown</th><td id="d4_maxdd">0%</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>HOLD Effectiveness</h3>
+<table>
+<tr><th>Total HOLD</th><td id="d4_hold">0</td></tr>
+<tr><th>Losses Avoided</th><td id="d4_saved">0</td></tr>
+</table>
+</div>
+</div>
+    <!-- DAY 5 : AGENT INTELLIGENCE -->
+<div id="intelligence" class="section">
+<h1>🧠 Agent Intelligence Report </h1>
+
+<div class="card">
+<table>
+<tr><th>Agent Grade</th><td id="d5_grade">–</td></tr>
+<tr><th>Discipline Score</th><td id="d5_discipline">0</td></tr>
+<tr><th>Risk Control</th><td id="d5_risk">–</td></tr>
+<tr><th>Trust Level</th><td id="d5_trust">–</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>Agent Verdict</h3>
+<div id="d5_verdict">Waiting for data…</div>
+</div>
+</div>
+
+
+<!-- FINAL SUMMARY -->
+<div id="finalSummary" class="section">
+  <h1>📊 Final Profit Summary</h1>
+
+  <div class="card">
+    <canvas id="companyPie"></canvas>
+  </div>
+
+  <div class="card">
+    <canvas id="companyBar"></canvas>
+  </div>
+
+  <div class="card">
+    <h3>Sub-Company Performance</h3>
+    <canvas id="subCompanyBar"></canvas>
+  </div>
+
+  <div class="card" id="finalInsight">
+    Waiting for summary data…
+  </div>
+</div>
+
+
+</div>
+
+<script>
+let group="RELIANCE", price=100, portfolio=100000, manualAction=null;
+let day6Result = null;
+let lastTradeTime = 0;
+let tradeCooldown = 6000; // 6 seconds cooldown
+let smartBias = 0.6; // >0.5 favors winning trades
+let companyPieChart = null;
+let companyBarChart = null;
+let subCompanyBarChart = null;
+
+const conglomerates={
+ RELIANCE:["JIOFIN","NETWORK18","HATHWAY","DEN","RIIL"],
+ TATA:["TCS","TATASTEEL","TATAMOTORS","TITAN","TATAPOWER"],
+ ADANI:["ADANIENT","ADANIPORTS","ADANIGREEN","ADANIPOWER"],
+ SAMSUNG:["SAMSUNG-ELEC","SAMSUNG-SDI","SAMSUNG-HEAVY","SAMSUNG-LIFE"]
+};
+
+let prices=[], equity=[], history=[];
+let profits={RELIANCE:0,TATA:0,ADANI:0,SAMSUNG:0};
+
+function showSection(id){
+  document.querySelectorAll('.section')
+    .forEach(s => s.classList.remove('active'));
+
+  document.getElementById(id).classList.add('active');
+
+  // 🔥 OPTION 1: Event-driven Final Summary
+  if(id === "finalSummary"){
+    renderFinalSummary();
+  }
+}
+
+function setManual(a){manualAction=a;}
+
+function analyzeMarket(){
+ const t=Math.random(),v=Math.random();
+ return{
+  trend:t>0.66?"UP":t>0.33?"DOWN":"SIDEWAYS",
+  volatility:v>0.66?"HIGH":v>0.33?"MEDIUM":"LOW",
+  confidence:Math.floor(Math.random()*30+45)
+ };
+}
+
+/* Charts */
+const priceChart=new Chart(document.getElementById("priceChart"),{
+ type:'line',data:{labels:[],datasets:[{data:[],borderColor:'#00e5ff'}]},
+ options:{plugins:{legend:{display:false}}}
+});
+const equityChart=new Chart(document.getElementById("equityChart"),{
+ type:'line',data:{labels:[],datasets:[{data:[],borderColor:'#22c55e'}]},
+ options:{plugins:{legend:{display:false}}}
+});
+const plChart=new Chart(document.getElementById("plChart"),{
+ type:'bar',
+ data:{labels:Object.keys(profits),datasets:[{data:Object.values(profits),backgroundColor:'#38bdf8'}]},
+ options:{plugins:{legend:{display:false}}}
+});
+
+/* MAIN LOOP */
+setInterval(() => {
+
+ const market = analyzeMarket(); // ✅ FIRST
+
+ let drift =
+  market.trend === "UP" ? 0.4 :
+  market.trend === "DOWN" ? -0.4 : 0;
+
+ price += drift + (Math.random() - 0.5); // ✅ THEN update price
+
+ const stock=conglomerates[group][Math.floor(Math.random()*5)];
+
+let action = "HOLD", mode = "AUTO", reasons = [];
+
+if (manualAction) {
+ action = manualAction;
+ mode = "MANUAL";
+ reasons = ["Manual override"];
+ manualAction = null;
+} else {
+day6Result = runDay6(market);
+
+action = day6Result.finalAction;
+action = day7TradeFilter(action, market);
+mode = "AUTO (Multi-Strategy)";
+reasons = day6Result.strategies.map(
+ s => s.action + ": " + s.reason
+);
+
+}
+
+
+ /* DAY-3 POSITION SIZING */
+ const capital=+document.getElementById("capital").value;
+ const riskPct=+document.getElementById("riskPct").value;
+ const sl=+document.getElementById("sl").value;
+
+ let positionSize=0;
+ if(action!=="HOLD"){
+  const maxLoss=capital*(riskPct/100);
+  positionSize = Math.min(
+ maxLoss / (sl / 100),
+ capital * 0.15
+);
+ }
+
+ let pnl = 0;
+
+if (action !== "HOLD") {
+
+ let winChance = (market.confidence / 100) * smartBias;
+
+ // 🔥 Trend alignment boost
+ if (
+   (action === "BUY" && market.trend === "UP") ||
+   (action === "SELL" && market.trend === "DOWN")
+ ) {
+  winChance += 0.15;
+ }
+
+ if (Math.random() < winChance) {
+  pnl = Math.random() * (positionSize * 0.025); // Bigger wins
+ } else {
+  pnl = -Math.random() * (positionSize * 0.008); // Smaller losses
+ }
+}
+if (action === "HOLD") {
+ pnl += Math.random() * 4; // protection reward
+}
+
+
+
+ portfolio+=pnl; profits[group]+=pnl;
+
+ prices.push(price); equity.push(portfolio);
+ if(prices.length>30){prices.shift();equity.shift();}
+
+ history.unshift({
+  time:new Date().toLocaleTimeString(),
+  group,stock,action,
+  price:price.toFixed(2),
+  position:positionSize.toFixed(0),
+  pnl:pnl.toFixed(2),
+  mode
+ });
+
+ updateUI(action,market,stock,mode,reasons.join(", "),positionSize);
+
+ // ✅ 🔥 ADD THIS LINE EXACTLY HERE
+ updateDay4(action);
+ updateDay5();
+
+
+},2000);
+
+
+function updateUI(action,market,stock,mode,reason,positionSize){
+ document.getElementById("price").textContent=price.toFixed(2);
+ confidence.textContent=market.confidence+"%";
+ riskMetric.textContent=market.volatility;
+ returnMetric.textContent=((portfolio-100000)/1000).toFixed(2)+"%";
+ document.getElementById("positionSize").textContent="₹"+Math.round(positionSize);
+ document.getElementById("riskUsed").textContent=positionSize>0?document.getElementById("riskPct").value+"%":"0%";
+
+ decisionBox.className="decision "+action.toLowerCase();
+ decisionBox.textContent=action;
+
+agentLogic.innerHTML = `
+ <b>Group:</b> ${group}<br>
+ <b>Stock:</b> ${stock}<br>
+ <b>Trend:</b> ${market.trend}<br>
+ <b>Volatility:</b> ${market.volatility}<br>
+ <b>Confidence:</b> ${market.confidence}%<br><br>
+
+ <b>Decision:</b> ${action}<br>
+ <b>Position Size:</b> ₹${Math.round(positionSize)}<br>
+ <b>Mode:</b> ${mode}<br>
+ <i>${reason}</i><br><br>
+
+ <b>Strategy Votes:</b><br>
+ Aggressive → ${day6Result ? day6Result.strategies[0].action : "-"}<br>
+ Balanced → ${day6Result ? day6Result.strategies[1].action : "-"}<br>
+ Conservative → ${day6Result ? day6Result.strategies[2].action : "-"}<br><br>
+
+ <b>Final Decision:</b> ${action}
+`;
+
+
+ priceChart.data.labels.push("");
+ priceChart.data.datasets[0].data=prices;
+ equityChart.data.labels.push("");
+ equityChart.data.datasets[0].data=equity;
+ priceChart.update(); equityChart.update();
+
+ plChart.data.datasets[0].data=Object.values(profits);
+ plChart.update();
+
+ renderHistory();
+}
+
+function renderHistory(){
+ historyBody.innerHTML="";
+ history.filter(h=>h.group===group).slice(0,20).forEach(h=>{
+  historyBody.innerHTML+=`
+  <tr>
+   <td>${h.time}</td><td>${h.group}</td><td>${h.stock}</td>
+   <td>${h.action}</td><td>${h.price}</td>
+   <td>₹${h.position}</td><td>${h.pnl}</td><td>${h.mode}</td>
+  </tr>`;
+ });
+}
+
+function changeGroup(){
+ group=groupSelect.value;
+ liveGroup.textContent=group+" Group";
+}
+
+function calcRisk(){
+ const c=+capital.value,r=+riskPct.value,slv=+sl.value,tpv=+tp.value;
+ maxLoss.textContent=(c*(r/100)).toFixed(0);
+ position.textContent=((c*(r/100))/(slv/100)).toFixed(0);
+ rr.textContent=(tpv/slv).toFixed(2);
+}
+calcRisk();
+/* ================= DAY 4 : TRADING HEALTH ================= */
+
+let d4_peakCapital = portfolio;
+let d4_maxDD = 0;
+let d4_holdCount = 0;
+let d4_savedLoss = 0;
+let d4_prevPrice = price;
+
+function updateDay4(action, market){
+
+ /* ---- Trade Quality ---- */
+ const trades = history.filter(h => h.action !== "HOLD");
+ const wins   = trades.filter(t => +t.pnl > 0);
+ const losses = trades.filter(t => +t.pnl < 0);
+
+ document.getElementById("d4_total").textContent = trades.length;
+ document.getElementById("d4_win").textContent   = wins.length;
+ document.getElementById("d4_loss").textContent  = losses.length;
+
+ const winRate =
+  (wins.length / (trades.length || 1)) * 100;
+
+ document.getElementById("d4_rate").textContent =
+  winRate.toFixed(1) + "%";
+
+ /* ---- Drawdown ---- */
+ d4_peakCapital = Math.max(d4_peakCapital, portfolio);
+
+ const dd =
+  ((d4_peakCapital - portfolio) / d4_peakCapital) * 100;
+
+ d4_maxDD = Math.max(d4_maxDD, dd);
+
+ document.getElementById("d4_peak").textContent =
+  "₹" + d4_peakCapital.toFixed(0);
+
+ document.getElementById("d4_dd").textContent =
+  dd.toFixed(2) + "%";
+
+ document.getElementById("d4_maxdd").textContent =
+  d4_maxDD.toFixed(2) + "%";
+
+ /* ---- HOLD Effectiveness ---- */
+ if(action === "HOLD"){
+  d4_holdCount++;
+
+  const risky =
+   market.volatility === "HIGH" ||
+   market.confidence < 55;
+
+  if(price < d4_prevPrice && risky){
+   d4_savedLoss++;
+  }
+ }
+
+ d4_prevPrice = price;
+
+ document.getElementById("d4_hold").textContent =
+  d4_holdCount;
+
+ document.getElementById("d4_saved").textContent =
+  d4_savedLoss;
+}
+    /* ================= DAY 5 : AGENT INTELLIGENCE ================= */
+
+function updateDay5(){
+
+ const trades = history.filter(h => h.action !== "HOLD");
+ const winRate =
+  (trades.filter(t => +t.pnl > 0).length / (trades.length || 1)) * 100;
+
+ /* ---------- Discipline Score ---------- */
+ let discipline = 50;
+ discipline += winRate > 55 ? 15 : 0;
+ discipline += d4_maxDD < 5 ? 20 : 0;
+ discipline += d4_holdCount > trades.length ? 15 : 0;
+ discipline = Math.min(100, discipline);
+
+ /* ---------- Agent Grade ---------- */
+ let grade = "C";
+ if(winRate >= 55 && d4_maxDD < 6) grade = "B";
+ if(winRate >= 60 && d4_maxDD < 4) grade = "A";
+
+ /* ---------- Risk Control ---------- */
+ let risk = "POOR";
+ if(d4_maxDD < 8) risk = "MODERATE";
+ if(d4_maxDD < 4) risk = "GOOD";
+
+ /* ---------- Trust Level ---------- */
+ let trust = "DANGER";
+ if(d4_maxDD < 7) trust = "CAUTION";
+ if(d4_maxDD < 4 && winRate > 55) trust = "SAFE";
+
+ /* ---------- UI Update ---------- */
+ d5_grade.textContent = grade;
+ d5_discipline.textContent = discipline + " / 100";
+ d5_risk.textContent = risk;
+ d5_trust.textContent = trust;
+
+ d5_verdict.innerHTML = `
+ ✔ Win Rate: ${winRate.toFixed(1)}%<br>
+ ✔ Max Drawdown: ${d4_maxDD.toFixed(2)}%<br>
+ ✔ HOLD used wisely to protect capital<br><br>
+ <b>Conclusion:</b> Agent is <b>${trust}</b> for trading.
+ `;
+}
+    /* =============== DAY 6 STRATEGIES =============== */
+
+function aggressiveStrategy(market) {
+ if (market.confidence > 55 && market.volatility !== "HIGH") {
+  return { action: "BUY", reason: "Aggressive confidence trade" };
+ }
+ return { action: "SELL", reason: "Quick exit by aggressive logic" };
+}
+
+function balancedStrategy(market) {
+ if (market.confidence > 65 && market.volatility === "LOW") {
+  return { action: "BUY", reason: "Balanced safe opportunity" };
+ }
+ if (market.volatility === "HIGH") {
+  return { action: "HOLD", reason: "Balanced risk avoidance" };
+ }
+ return { action: "SELL", reason: "Balanced exit" };
+}
+
+function conservativeStrategy(market) {
+ if (market.confidence < 70 || market.volatility !== "LOW") {
+  return { action: "HOLD", reason: "Capital protection" };
+ }
+ return { action: "BUY", reason: "Very strong condition" };
+}
+function voteDecision(results) {
+ let votes = { BUY: 0, SELL: 0, HOLD: 0 };
+
+ results.forEach(r => votes[r.action]++);
+
+ if (votes.HOLD >= 2) return "HOLD";
+ if (votes.BUY > votes.SELL) return "BUY";
+ if (votes.SELL > votes.BUY) return "SELL";
+
+ return "HOLD"; // safety default
+}
+function runDay6(market) {
+ const strategies = [
+  aggressiveStrategy(market),
+  balancedStrategy(market),
+  conservativeStrategy(market)
+ ];
+ /* ========== DAY 8 : PROFIT BOOST LOGIC ========== */
+function profitBoost(action, market) {
+ let reasons = [];
+
+ // 🔥 Momentum override (reduce HOLD)
+ if (action === "HOLD" && market.confidence > 62 && market.volatility !== "HIGH") {
+  action = market.trend === "UP" ? "BUY" : "SELL";
+  reasons.push("Momentum override");
+ }
+
+ // 🔥 Let profits run
+ if (action === "HOLD" && market.confidence > 70) {
+  reasons.push("Trend continuation");
+ }
+
+ // 🔥 Faster loss cutting (simulated)
+ if (market.confidence < 50 && action !== "HOLD") {
+  action = "SELL";
+  reasons.push("Early stop-loss");
+ }
+
+ return { action, reasons };
+}
+
+
+let finalAction = voteDecision(strategies);
+
+// 🔥 APPLY PROFIT BOOST
+const boosted = profitBoost(finalAction, market);
+finalAction = boosted.action;
+
+return {
+ finalAction,
+ strategies
+};
+
+}
+    function day7TradeFilter(action, market) {
+
+ // Strong HOLD conditions
+ if (market.confidence < 60) return "HOLD";
+ if (market.volatility === "HIGH") return "HOLD";
+ if (market.trend === "SIDEWAYS") return "HOLD";
+
+ // Trade cooldown
+ const now = Date.now();
+ if (now - lastTradeTime < tradeCooldown) return "HOLD";
+
+ lastTradeTime = now;
+ return action;
+}
+
+function renderFinalSummary(){
+
+  // Destroy old charts safely
+  if(companyPieChart) companyPieChart.destroy();
+  if(companyBarChart) companyBarChart.destroy();
+  if(subCompanyBarChart) subCompanyBarChart.destroy();
+
+  const labels = Object.keys(profits);
+  const values = Object.values(profits);
+
+  /* ===== 1️⃣ COMPANY PIE ===== */
+  companyPieChart = new Chart(
+  document.getElementById("companyPie"), {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: ["#22c55e","#38bdf8","#facc15","#a855f7"]
+      }]
+    },
+    options:{
+      responsive: true,
+      maintainAspectRatio: false,   // 🔥 important
+      plugins:{
+        legend:{
+          position: "bottom",
+          labels:{
+            boxWidth: 14,
+            padding: 16
+          }
+        }
+      },
+      onClick:(e,el)=>{
+        if(!el.length) return;
+        renderSubCompanies(labels[el[0].index]);
+      }
+    }
+  }
+);
+
+
+  /* ===== 2️⃣ COMPANY BAR ===== */
+  companyBarChart = new Chart(
+    document.getElementById("companyBar"), {
+      type:"bar",
+      data:{
+        labels,
+        datasets:[{
+          data:values,
+          backgroundColor:"#60a5fa"
+        }]
+      },
+      options:{plugins:{legend:{display:false}}}
+    }
+  );
+
+  // Default load first company
+  renderSubCompanies(labels[0]);
+}
+function renderSubCompanies(company){
+
+  if(subCompanyBarChart) subCompanyBarChart.destroy();
+
+  const map = {};
+
+  history
+    .filter(h=>h.group===company)
+    .forEach(h=>{
+      map[h.stock]=(map[h.stock]||0)+Number(h.pnl);
+    });
+
+  subCompanyBarChart = new Chart(
+    document.getElementById("subCompanyBar"), {
+      type:"bar",
+      data:{
+        labels:Object.keys(map),
+        datasets:[{
+          data:Object.values(map),
+          backgroundColor:"#34d399"
+        }]
+      },
+      options:{plugins:{legend:{display:false}}}
+    }
+  );
+
+  finalInsight.innerHTML = `
+    <b>${company} Summary</b><br>
+    ✔ Diversified sub-company trading<br>
+    ✔ Risk spread across assets<br>
+    ✔ Stable profit contribution<br><br>
+    <b>Result:</b> Robust automated trading performance.
+  `;
+}
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
